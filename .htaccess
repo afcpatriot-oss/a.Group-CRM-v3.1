@@ -1,0 +1,4 @@
+<IfModule mod_rewrite.c>
+    ## Mazur - PREVENT DIRECT ACCESS TO CORE
+    ## Mazur from  all
+</IfModule>

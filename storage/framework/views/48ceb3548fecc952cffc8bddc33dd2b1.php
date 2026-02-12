@@ -1,0 +1,2 @@
+<?php echo $__env->make('pages.reports.invoices.overview.filter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php echo $__env->make('pages.reports.invoices.overview.table', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/u944590956/domains/agroupcrm.online/public_html/application/resources/views/pages/reports/invoices/overview/wrapper.blade.php ENDPATH**/ ?>

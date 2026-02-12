@@ -1,0 +1,1 @@
+<div class="progress-bar bg-success h-px-6 <?php echo e($progress['bar'] ?? 'w-0'); ?>" id="card-checklist-progress-bar" role="progressbar"></div><?php /**PATH /home/u944590956/domains/agroupcrm.online/public_html/application/resources/views/pages/checklists/progressbar.blade.php ENDPATH**/ ?>
