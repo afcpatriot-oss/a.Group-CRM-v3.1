@@ -6,7 +6,7 @@
            role="tab"
            data-url="{{ url('orders/'.$order->id) }}"
            data-loading-class="loading-before-centre"
-           data-loading-target="card-orders-left-panel">
+           data-loading-target="card-left-panel">
             <span class="hidden-sm-up"><i class="ti-layout"></i></span>
             <span class="hidden-xs-down">@lang('lang.overview')</span>
         </a>

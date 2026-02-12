@@ -39,6 +39,6 @@
 
 </div>
 <!--main content -->
-@include('pages.orders.modal')
+@include('pages.task.modal')
 
 @endsection

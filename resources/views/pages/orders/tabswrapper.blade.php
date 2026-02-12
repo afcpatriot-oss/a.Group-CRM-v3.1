@@ -19,4 +19,4 @@
 <!--orders table-->
 
 
-@include('pages.orders.modal')
+@include('pages.task.modal')
