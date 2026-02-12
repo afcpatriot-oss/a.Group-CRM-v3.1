@@ -39,5 +39,6 @@
 
 </div>
 <!--main content -->
+@include('pages.orders.modal')
 
 @endsection

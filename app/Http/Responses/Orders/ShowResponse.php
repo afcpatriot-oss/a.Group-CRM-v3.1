@@ -19,23 +19,55 @@ class ShowResponse implements Responsable
             $$key = $value;
         }
 
-        $html = view('pages.orders.components.modals.show', compact('order'))->render();
+        $jsondata = [];
 
-        return response()->json([
-            'dom_html' => [
-                [
-                    'selector' => '#cardModalBody',
-                    'action' => 'replace',
-                    'value' => $html,
-                ],
-            ],
-            'dom_visibility' => [
-                [
-                    'selector' => '#cardModal',
-                    'action' => 'show',
-                ],
-            ],
-            'modal_title' => cleanLang(__('lang.order')) . ' ' . ($order->order_number ?? ('#' . $order->id)),
-        ]);
+        $container = view('pages.orders.components.card.container')->render();
+        $content = view('pages.orders.components.card.content')->render();
+        $tabmenu = view('pages.orders.components.card.tabmenu', compact('order'))->render();
+        $leftpanel = view('pages.orders.components.modals.show', compact('order'))->render();
+        $rightpanel = view('pages.orders.components.card.rightpanel', compact('order'))->render();
+
+        $jsondata['dom_html'][] = [
+            'selector' => '#cardModalContainer',
+            'action' => 'replace-with',
+            'value' => $container,
+        ];
+
+        $jsondata['dom_html'][] = [
+            'selector' => '#cardModalContent',
+            'action' => 'replace-with',
+            'value' => $content,
+        ];
+
+        $jsondata['dom_html'][] = [
+            'selector' => '#cardModalTabMenu',
+            'action' => 'replace',
+            'value' => $tabmenu,
+        ];
+
+        $jsondata['dom_html'][] = [
+            'selector' => '#card-orders-left-panel',
+            'action' => 'replace',
+            'value' => $leftpanel,
+        ];
+
+        $jsondata['dom_html'][] = [
+            'selector' => '#card--orders-right-panel',
+            'action' => 'replace',
+            'value' => $rightpanel,
+        ];
+
+        $jsondata['dom_classes'][] = [
+            'selector' => '#cardModalContent',
+            'action' => 'remove',
+            'value' => 'hidden',
+        ];
+
+        $jsondata['dom_visibility'][] = [
+            'selector' => '#cardModal',
+            'action' => 'show',
+        ];
+
+        return response()->json($jsondata);
     }
 }

@@ -17,3 +17,6 @@
 @include('pages.orders.components.table.wrapper')
 </div>
 <!--orders table-->
+
+
+@include('pages.orders.modal')
