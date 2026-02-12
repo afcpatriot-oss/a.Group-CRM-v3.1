@@ -16,20 +16,13 @@
         <div class="table-responsive list-table-wrapper">
 
             @if (@count($orders ?? []) > 0)
-
-            <table id="orders-list-table"
-                   class="table m-t-0 m-b-0 table-hover no-wrap contact-list"
-                   data-page-size="10">
-
+            <table id="orders-list-table" class="table m-t-0 m-b-0 table-hover no-wrap contact-list" data-page-size="10">
                 <thead>
                     <tr>
-
                         @if(config('visibility.orders_col_checkboxes'))
                         <th class="list-checkbox-wrapper">
                             <span class="list-checkboxes display-inline-block w-px-20">
-                                <input type="checkbox"
-                                    id="listcheckbox-orders"
-                                    name="listcheckbox-orders"
+                                <input type="checkbox" id="listcheckbox-orders" name="listcheckbox-orders"
                                     class="listcheckbox-all filled-in chk-col-light-blue"
                                     data-actions-container-class="orders-checkbox-actions-container"
                                     data-children-checkbox-class="listcheckbox-orders">
@@ -40,81 +33,56 @@
 
                         @if(config('visibility.orders_col_id'))
                         <th class="orders_col_id">
-                            <a class="js-ajax-ux-request js-list-sorting"
-                                id="sort_order_id"
-                                href="javascript:void(0)"
+                            <a class="js-ajax-ux-request js-list-sorting" id="sort_order_id" href="javascript:void(0)"
                                 data-url="{{ urlResource('/orders?action=sort&orderby=id&sortorder=asc') }}">
                                 {{ cleanLang(__('lang.id')) }}
-                                <span class="sorting-icons">
-                                    <i class="ti-arrows-vertical"></i>
-                                </span>
+                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
                             </a>
                         </th>
                         @endif
 
                         <th class="orders_col_number">
-                            <a class="js-ajax-ux-request js-list-sorting"
-                                id="sort_order_number"
-                                href="javascript:void(0)"
+                            <a class="js-ajax-ux-request js-list-sorting" id="sort_order_number" href="javascript:void(0)"
                                 data-url="{{ urlResource('/orders?action=sort&orderby=order_number&sortorder=asc') }}">
                                 {{ cleanLang(__('lang.order')) }}
-                                <span class="sorting-icons">
-                                    <i class="ti-arrows-vertical"></i>
-                                </span>
+                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
                             </a>
                         </th>
 
                         <th class="orders_col_client">
-                            <a class="js-ajax-ux-request js-list-sorting"
-                                id="sort_client"
-                                href="javascript:void(0)"
+                            <a class="js-ajax-ux-request js-list-sorting" id="sort_client" href="javascript:void(0)"
                                 data-url="{{ urlResource('/orders?action=sort&orderby=client_name&sortorder=asc') }}">
                                 {{ cleanLang(__('lang.client')) }}
-                                <span class="sorting-icons">
-                                    <i class="ti-arrows-vertical"></i>
-                                </span>
+                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
                             </a>
                         </th>
 
                         <th class="orders_col_date">
-                            <a class="js-ajax-ux-request js-list-sorting"
-                                id="sort_order_created"
-                                href="javascript:void(0)"
+                            <a class="js-ajax-ux-request js-list-sorting" id="sort_order_created" href="javascript:void(0)"
                                 data-url="{{ urlResource('/orders?action=sort&orderby=order_created&sortorder=asc') }}">
                                 {{ cleanLang(__('lang.date')) }}
-                                <span class="sorting-icons">
-                                    <i class="ti-arrows-vertical"></i>
-                                </span>
+                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
                             </a>
                         </th>
 
                         <th class="orders_col_status">
-                            <a class="js-ajax-ux-request js-list-sorting"
-                                id="sort_status"
-                                href="javascript:void(0)"
+                            <a class="js-ajax-ux-request js-list-sorting" id="sort_status" href="javascript:void(0)"
                                 data-url="{{ urlResource('/orders?action=sort&orderby=status_id&sortorder=asc') }}">
                                 {{ cleanLang(__('lang.status')) }}
-                                <span class="sorting-icons">
-                                    <i class="ti-arrows-vertical"></i>
-                                </span>
+                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
                             </a>
                         </th>
 
                         @if(config('visibility.orders_col_action'))
                         <th class="orders_col_action">
-                            <a href="javascript:void(0)">
-                                {{ cleanLang(__('lang.action')) }}
-                            </a>
+                            <a href="javascript:void(0)">{{ cleanLang(__('lang.action')) }}</a>
                         </th>
                         @endif
-
                     </tr>
                 </thead>
 
                 <tbody id="orders-td-container">
-                    <!--ajax content here-->
                     @include('pages.orders.components.table.ajax')
-                    <!--ajax content here-->
                 </tbody>
 
                 <tfoot>
@@ -124,13 +92,11 @@
                         </td>
                     </tr>
                 </tfoot>
-
             </table>
-
             @endif
 
             @if (@count($orders ?? []) == 0)
-                @include('notifications.no-results-found')
+            @include('notifications.no-results-found')
             @endif
 
         </div>

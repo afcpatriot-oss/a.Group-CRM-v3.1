@@ -106,13 +106,16 @@ class Orders extends Controller
         $orders = $this->orderrepo->search($id);
 
         if (!$order = $orders->first()) {
-            abort(404);
+            abort(409, __('lang.order_not_found'));
         }
 
-        return new ShowResponse([
-            'order'  => $order,
+        $payload = [
+            'page' => $this->pageSettings(),
+            'order' => $order,
             'fields' => $this->getCustomFields($order),
-        ]);
+        ];
+
+        return new ShowResponse($payload);
     }
 
     /* ===================================================
