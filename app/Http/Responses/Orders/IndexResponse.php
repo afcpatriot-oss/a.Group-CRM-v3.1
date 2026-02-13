@@ -20,27 +20,10 @@ class IndexResponse implements Responsable
             $$key = $value;
         }
 
-        // Force visibility flags for Orders list page (parity with Tickets)
-        config([
-            'visibility.list_page_actions_search' => true,
-            'visibility.list_page_actions_add_button' => true,
-            'visibility.list_page_actions_filter_button' => true,
-            'visibility.list_page_actions_exporting' => true,
-            'visibility.archived_orders_toggle_button' => true,
-            'visibility.stats_toggle_button' => true,
-
-            'visibility.orders_col_action' => true,
-            'visibility.action_buttons_delete' => true,
-            'visibility.action_buttons_edit' => true,
-        ]);
-
         // SAFETY: stats must always exist (even empty)
         if (!isset($stats)) {
             $stats = [];
         }
-
-        // fire event (enable visibility like tickets)
-        event(new \App\Events\Orders\Responses\OrderIndex($request, $this->payload));
 
         // if filtering with remember checked, or clearing filter, redirect to reload page
         if ((request('query-type') == 'filter' && request()->filled('filter_remember')) || request('clear-filter') == 'yes') {
