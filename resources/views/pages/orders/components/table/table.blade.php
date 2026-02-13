@@ -41,13 +41,17 @@
                         </th>
                         @endif
 
-                        <th class="orders_col_number">
-                            <a class="js-ajax-ux-request js-list-sorting" id="sort_order_number" href="javascript:void(0)"
-                                data-url="{{ urlResource('/orders?action=sort&orderby=order_number&sortorder=asc') }}">
-                                {{ cleanLang(__('lang.order')) }}
-                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
-                            </a>
-                        </th>
+                        <th class="orders_col_subject">
+                    <th class="orders_col_user">
+             <a class="js-ajax-ux-request js-list-sorting"
+       id="sort_order_user"
+       href="javascript:void(0)"
+       data-url="{{ urlResource('/orders?action=sort&orderby=first_name&sortorder=asc') }}">
+       {{ cleanLang(__('lang.user')) }}
+       <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
+    </a>
+</th>
+
 
                         <th class="orders_col_client">
                             <a class="js-ajax-ux-request js-list-sorting" id="sort_client" href="javascript:void(0)"
