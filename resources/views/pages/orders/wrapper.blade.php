@@ -13,7 +13,7 @@
         <!--Page Title & Bread Crumbs -->
 
         <!-- action buttons -->
-        @include('pages.components.list-page-actions')
+        @include('pages.orders.components.misc.list-page-actions')
         <!-- action buttons -->
 
     </div>
