@@ -53,7 +53,7 @@ class Orders extends Controller
         $statuses = \App\Models\OrderStatus::orderBy('sort_order', 'asc')->get();
 
         $payload = [
-            'page'     => $this->pageSettings(),
+            'page'     => $this->pageSettings('orders'),
             'orders'   => $orders,
             'stats'    => $stats,
             'statuses' => $statuses,
