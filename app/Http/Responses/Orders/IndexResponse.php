@@ -20,14 +20,19 @@ class IndexResponse implements Responsable
             $$key = $value;
         }
 
-        $this->visibility = [
-            'list-page-actions' => 'show',
-        ];
-
         // SAFETY: stats must always exist (even empty)
         if (!isset($stats)) {
             $stats = [];
         }
+
+        config([
+            'visibility.list_page_actions_add_button' => true,
+            'visibility.list_page_actions_search' => true,
+            'visibility.list_page_actions_filter_button' => true,
+            'visibility.list_page_actions_exporting' => false,
+            'visibility.archived_orders_toggle_button' => true,
+            'visibility.stats_toggle_button' => true,
+        ]);
 
         // if filtering with remember checked, or clearing filter, redirect to reload page
         if ((request('query-type') == 'filter' && request()->filled('filter_remember')) || request('clear-filter') == 'yes') {
