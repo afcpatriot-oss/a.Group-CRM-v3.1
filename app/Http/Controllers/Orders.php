@@ -244,14 +244,71 @@ class Orders extends Controller
        PAGE SETTINGS
     =================================================== */
 
-    private function pageSettings()
+    private function pageSettings($section = '', $data = [])
     {
-        return [
-            'crumbs' => [__('lang.orders')],
-            'page'   => 'orders',
-            'meta_title' => __('lang.orders'),
-            'heading'    => __('lang.orders'),
+        //common settings
+        $page = [
+            'crumbs' => [
+                __('lang.orders'),
+            ],
+            'crumbs_special_class' => 'list-pages-crumbs',
+            'page' => 'orders',
+            'no_results_message' => __('lang.no_results_found'),
+            'mainmenu_support' => 'active',
+            'sidepanel_id' => 'sidepanel-filter-orders',
+            'dynamic_search_url' => url('orders/search?action=search'),
             'load_more_button_route' => 'orders',
+            'source' => 'list',
+            'crumbs_col_size' => 'col-lg-5',
         ];
+
+        //default modal settings (modify for sepecif sections)
+        $page += [
+            'add_button_link_url' => url('orders/create'),
+        ];
+
+        //orders list page
+        if ($section == 'orders') {
+            $page += [
+                'meta_title' => __('lang.orders'),
+                'heading' => __('lang.orders'),
+                'submenu_orders' => 'active',
+            ];
+            if (request('source') == 'ext') {
+                $page += [
+                    'list_page_actions_size' => 'col-lg-12',
+                ];
+            }
+            return $page;
+        }
+
+        //orders list page
+        if ($section == 'create') {
+            $page['crumbs'] = [
+                __('lang.orders'),
+                __('lang.create_new_order'),
+            ];
+            $page += [
+                'meta_title' => __('lang.open_support_order'),
+                'heading' => __('lang.orders'),
+                'mainmenu_orders' => 'active',
+            ];
+            return $page;
+        }
+
+        //order page
+        if ($section == 'order') {
+            $page['crumbs'] = [
+                __('lang.support_orders'),
+                __('lang.id') . ' #' . $data->order_id,
+            ];
+            $page['page'] = 'order';
+            $page['heading'] = $data->order_subject;
+            $page['crumbs_col_size'] = 'col-lg-9';
+            return $page;
+        }
+
+        //return
+        return $page;
     }
 }
