@@ -25,6 +25,9 @@ class IndexResponse implements Responsable
             $stats = [];
         }
 
+        // fire event (enable visibility like tickets)
+        event(new \App\Events\Orders\Responses\OrderIndex($request, $this->payload));
+
         // if filtering with remember checked, or clearing filter, redirect to reload page
         if ((request('query-type') == 'filter' && request()->filled('filter_remember')) || request('clear-filter') == 'yes') {
             $jsondata['redirect_url'] = url('/orders');
