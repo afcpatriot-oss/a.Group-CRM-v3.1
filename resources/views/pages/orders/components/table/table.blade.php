@@ -42,12 +42,7 @@
                         @endif
 
                         <th class="orders_col_subject">
-                            <a class="js-ajax-ux-request js-list-sorting" id="sort_order_number" href="javascript:void(0)"
-                                data-url="{{ urlResource('/orders?action=sort&orderby=order_number&sortorder=asc') }}">
-                                {{ cleanLang(__('lang.order')) }}
-                                <span class="sorting-icons"><i class="ti-arrows-vertical"></i></span>
-                            </a>
-                        </th>
+
 
                         <th class="orders_col_user">
                             <a class="js-ajax-ux-request js-list-sorting" id="sort_user" href="javascript:void(0)"
