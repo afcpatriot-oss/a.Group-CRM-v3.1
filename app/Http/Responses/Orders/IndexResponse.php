@@ -29,7 +29,7 @@ class IndexResponse implements Responsable
             'visibility.list_page_actions_add_button' => true,
             'visibility.list_page_actions_search' => true,
             'visibility.list_page_actions_filter_button' => true,
-            'visibility.list_page_actions_exporting' => false,
+            'visibility.list_page_actions_exporting' => true,
             'visibility.archived_orders_toggle_button' => true,
             'visibility.stats_toggle_button' => true,
         ]);
