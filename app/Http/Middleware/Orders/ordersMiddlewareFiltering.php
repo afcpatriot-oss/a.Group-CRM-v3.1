@@ -39,6 +39,14 @@ class ordersMiddlewareFiltering {
             $this->applyFilter();
         }
 
+        if (auth()->user()->role->role_orders >= 3) {
+            config(['visibility.action_buttons_delete' => true]);
+        }
+
+        if (auth()->user()->role->role_orders >= 2) {
+            config(['visibility.action_buttons_edit' => true]);
+        }
+
         return $next($request);
     }
 
