@@ -34,6 +34,43 @@ class Orders extends Controller
 
         $this->middleware('auth');
 
+        // Filtering
+        $this->middleware('ordersMiddlewareFiltering')->only([
+            'index',
+        ]);
+
+        // Index & list actions
+        $this->middleware('ordersMiddlewareIndex')->only([
+            'index',
+            'update',
+            'store',
+            'archive',
+            'restore',
+            'changeStatusUpdate',
+        ]);
+
+        // Create
+        $this->middleware('ordersMiddlewareCreate')->only([
+            'create',
+            'store',
+        ]);
+
+        // Edit
+        $this->middleware('ordersMiddlewareEdit')->only([
+            'edit',
+            'update',
+        ]);
+
+        // Show
+        $this->middleware('ordersMiddlewareShow')->only([
+            'show',
+        ]);
+
+        // Destroy
+        $this->middleware('ordersMiddlewareDestroy')->only([
+            'destroy',
+        ]);
+
         $this->orderrepo = $orderrepo;
         $this->tagrepo = $tagrepo;
         $this->customrepo = $customrepo;

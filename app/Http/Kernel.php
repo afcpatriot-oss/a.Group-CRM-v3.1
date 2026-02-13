@@ -211,6 +211,14 @@ class Kernel extends HttpKernel {
         'contactsMiddlewareDestroy' => \App\Http\Middleware\Contacts\Destroy::class,
         'contactsMiddlewareShow' => \App\Http\Middleware\Contacts\Show::class,
 
+        //[growcrm] - [orders]
+        'ordersMiddlewareFiltering' => \App\Http\Middleware\Orders\ordersMiddlewareFiltering::class,
+        'ordersMiddlewareIndex' => \App\Http\Middleware\Orders\ordersMiddlewareIndex::class,
+        'ordersMiddlewareCreate' => \App\Http\Middleware\Orders\ordersMiddlewareCreate::class,
+        'ordersMiddlewareEdit' => \App\Http\Middleware\Orders\ordersMiddlewareEdit::class,
+        'ordersMiddlewareDestroy' => \App\Http\Middleware\Orders\ordersMiddlewareDestroy::class,
+        'ordersMiddlewareShow' => \App\Http\Middleware\Orders\ordersMiddlewareShow::class,
+
         //[growcrm] - [tickets]
         'ticketsMiddlewareIndex' => \App\Http\Middleware\Tickets\Index::class,
         'ticketsMiddlewareFiltering' => \App\Http\Middleware\Tickets\Filtering::class,
