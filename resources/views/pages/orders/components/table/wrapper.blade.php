@@ -11,7 +11,4 @@
 <!--filter-->
 
 <!--export-->
-@if(config('visibility.list_page_actions_exporting'))
-@include('pages.export.orders.export')
-@endif
 <!--export-->
