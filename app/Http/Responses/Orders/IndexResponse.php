@@ -20,6 +20,10 @@ class IndexResponse implements Responsable
             $$key = $value;
         }
 
+        $this->visibility = [
+            'list-page-actions' => 'show',
+        ];
+
         // SAFETY: stats must always exist (even empty)
         if (!isset($stats)) {
             $stats = [];
