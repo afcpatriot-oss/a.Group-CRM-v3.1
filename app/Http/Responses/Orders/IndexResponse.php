@@ -29,9 +29,13 @@ class IndexResponse implements Responsable
             'visibility.list_page_actions_add_button' => true,
             'visibility.list_page_actions_search' => true,
             'visibility.list_page_actions_filter_button' => true,
-            'visibility.list_page_actions_exporting' => true,
+            'visibility.list_page_actions_exporting' => false,
             'visibility.archived_orders_toggle_button' => true,
             'visibility.stats_toggle_button' => true,
+            'visibility.orders_col_action' => true,
+            'visibility.orders_col_checkboxes' => true,
+            'visibility.action_buttons_delete' => true,
+            'visibility.action_buttons_edit' => true,
         ]);
 
         // if filtering with remember checked, or clearing filter, redirect to reload page
