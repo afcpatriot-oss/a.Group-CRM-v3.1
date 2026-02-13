@@ -252,6 +252,14 @@ class Orders extends Controller
             'meta_title' => __('lang.orders'),
             'heading'    => __('lang.orders'),
             'load_more_button_route' => 'orders',
+            'visibility' => [
+                'list_page_actions_search' => true,
+                'list_page_actions_add_button' => true,
+                'list_page_actions_filter_button' => true,
+                'list_page_actions_exporting' => true,
+                'archived_orders_toggle_button' => true,
+                'stats_toggle_button' => true,
+            ],
         ];
     }
 }
