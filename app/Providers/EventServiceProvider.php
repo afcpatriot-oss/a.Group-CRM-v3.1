@@ -22,9 +22,6 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Event' => [
             'App\Listeners\EventListener',
         ],
-        'App\Events\Orders\Responses\OrderIndex' => [
-            'App\Listeners\Orders\Responses\OrderIndexListener',
-        ],
     ];
 
     /**
