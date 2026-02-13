@@ -32,6 +32,14 @@ class ordersMiddlewareIndex {
         //team user permission
         if (auth()->user()->is_team) {
             if (auth()->user()->role->role_orders >= 1) {
+                if(auth()->user()->role->role_orders >= 3){
+                    config(['visibility.action_buttons_delete' => true]);
+                }
+
+                if(auth()->user()->role->role_orders >= 2){
+                    config(['visibility.action_buttons_edit' => true]);
+                }
+
                 return $next($request);
             }
         }
