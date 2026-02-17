@@ -3,16 +3,21 @@
 /** --------------------------------------------------------------------------------
  * This middleware class handles [create] precheck processes for tickets
  *
- * @package    Grow CRM
- * @author     NextLoop
+ * @package    a.Group CRM
+ * @author     Mazur 14.02.2026
+ *             Quick Order flow: order by phone, auto-resolve client,
+ *             auto-create Client + mandatory User (without email)
  *----------------------------------------------------------------------------------*/
 
 namespace App\Http\Middleware\Tickets;
+
 use App\Models\Client;
+use App\Models\User;
 use Closure;
 use DB;
 use Log;
 use Throwable;
+use Illuminate\Support\Str;
 
 class Create {
 
@@ -48,7 +53,15 @@ class Create {
         }
 
         //permission denied
-        Log::error("permission denied", ['process' => '[permissions][tickets][create]', 'ref' => config('app.debug_ref'), 'function' => __function__, 'file' => basename(__FILE__), 'line' => __line__, 'path' => __file__]);
+        Log::error("permission denied", [
+            'process' => '[permissions][tickets][create]',
+            'ref' => config('app.debug_ref'),
+            'function' => __function__,
+            'file' => basename(__FILE__),
+            'line' => __line__,
+            'path' => __file__,
+        ]);
+
         abort(403);
     }
 
@@ -57,7 +70,6 @@ class Create {
      */
     private function fronteEnd() {
 
-        
         //client prefill
         if (auth()->user()->is_client) {
             request()->merge([
@@ -65,8 +77,6 @@ class Create {
                 'ticket_clientid' => auth()->user()->clientid,
             ]);
         }
-
-
     }
 
     /**
@@ -87,7 +97,9 @@ class Create {
         ];
 
         foreach ($quick_order_flags as $flag) {
-            if ($request->filled($flag) && in_array((string) $request->input($flag), ['1', 'true', 'yes', 'on'])) {
+            if ($request->filled($flag)
+                && in_array((string)$request->input($flag), ['1', 'true', 'yes', 'on'])
+            ) {
                 return true;
             }
         }
@@ -95,25 +107,34 @@ class Create {
         return false;
     }
 
-    /**
-     * wraps quick-order client resolve/create + ticket store in one transaction
-     * @param object $request
-     * @param object $next
-     * @return mixed
-     */
     private function handleQuickOrderFlow($request, $next) {
 
         DB::beginTransaction();
 
         try {
+
+            //auto-fill subject for system-created orders (hidden in UI)
+            if (!$request->filled('ticket_subject')) {
+                request()->merge([
+                    'ticket_subject' => cleanLang(__('lang.order_created_by_system')),
+                ]);
+            }
+
+            //auto-fill description for system-created orders (hidden in UI)
+            if (!$request->filled('ticket_message')) {
+                request()->merge([
+                    'ticket_message' => cleanLang(__('lang.order_processing')),
+                ]);
+            }
+
             $this->resolveQuickOrderClient($request);
 
             $response = $next($request);
 
-            //if we got here without an exception, preserve created resources
             DB::commit();
 
             return $response;
+
         } catch (Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -121,7 +142,9 @@ class Create {
     }
 
     /**
-     * resolve existing client by phone or create a new one and merge ticket_clientid
+     * resolve existing client by phone or create a new one
+     * and merge ticket_clientid
+     *
      * @param object $request
      * @return void
      */
@@ -129,10 +152,11 @@ class Create {
 
         $phone = $this->extractQuickOrderPhone($request);
 
-        //respect existing explicit selection from regular flow when no quick-order phone was sent
+        //respect existing explicit selection from regular flow
         if ($request->filled('ticket_clientid') && $phone == '') {
             return;
         }
+
         if ($phone == '') {
             return;
         }
@@ -155,15 +179,19 @@ class Create {
             return;
         }
 
-        //fallback lock to avoid duplicate client creation by concurrent quick-orders
+        //fallback lock to avoid duplicate client creation
         $lock_name = 'quick-order-client-' . md5($normalized_phone);
-        $supports_advisory_lock = in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb']);
+        $supports_advisory_lock = in_array(
+            DB::connection()->getDriverName(),
+            ['mysql', 'mariadb']
+        );
 
         if ($supports_advisory_lock) {
-            DB::select('SELECT GET_LOCK(?, 10) AS quick_order_lock', [$lock_name]);
+            DB::select('SELECT GET_LOCK(?, 10)', [$lock_name]);
         }
 
         try {
+
             $existing_client = Client::where('client_phone', $normalized_phone)
                 ->lockForUpdate()
                 ->orderBy('client_id', 'asc')
@@ -176,6 +204,11 @@ class Create {
                 return;
             }
 
+            /**
+             * -------------------------------------------------------------
+             * CREATE NEW CLIENT (Quick Order)
+             * -------------------------------------------------------------
+             */
             $client = new Client();
             $client->client_creatorid = auth()->id() ?? 0;
             $client->client_company_name = $this->deriveQuickOrderClientName($request);
@@ -185,9 +218,29 @@ class Create {
             $client->client_created = now();
             $client->save();
 
+            /**
+             * -------------------------------------------------------------
+             * CREATE MANDATORY USER FOR NEW CLIENT
+             * (email is optional / null allowed)
+             * -------------------------------------------------------------
+             */
+            $user = new User();
+            $user->name = $client->client_company_name ?: __('lang.client');
+            $user->email = null;
+            $user->password = bcrypt(Str::random(32)); // technical user
+            $user->is_client = true;
+            $user->clientid = $client->client_id;
+            $user->status = 'active';
+            $user->save();
+
+            //bind client → user
+            $client->user_id = $user->id;
+            $client->save();
+
             request()->merge([
                 'ticket_clientid' => $client->client_id,
             ]);
+
         } finally {
             if ($supports_advisory_lock) {
                 DB::select('SELECT RELEASE_LOCK(?)', [$lock_name]);
@@ -201,7 +254,8 @@ class Create {
      * @return string
      */
     private function normalizePhone($phone) {
-        $phone = trim((string) $phone);
+
+        $phone = trim((string)$phone);
         if ($phone == '') {
             return '';
         }
@@ -213,11 +267,7 @@ class Create {
             return '';
         }
 
-        if ($has_plus_prefix) {
-            return '+' . $digits;
-        }
-
-        return $digits;
+        return $has_plus_prefix ? '+' . $digits : $digits;
     }
 
     /**
@@ -226,6 +276,7 @@ class Create {
      * @return string
      */
     private function extractQuickOrderPhone($request) {
+
         $phone_fields = [
             'quick_order_phone',
             'ticket_quick_order_phone',
@@ -236,7 +287,7 @@ class Create {
 
         foreach ($phone_fields as $field) {
             if ($request->filled($field)) {
-                return (string) $request->input($field);
+                return (string)$request->input($field);
             }
         }
 
@@ -249,6 +300,7 @@ class Create {
      * @return string
      */
     private function deriveQuickOrderClientName($request) {
+
         $name_fields = [
             'quick_order_name',
             'ticket_quick_order_name',
@@ -259,7 +311,7 @@ class Create {
 
         foreach ($name_fields as $field) {
             if ($request->filled($field)) {
-                return trim((string) $request->input($field));
+                return trim((string)$request->input($field));
             }
         }
 
