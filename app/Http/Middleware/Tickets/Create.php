@@ -179,94 +179,81 @@ class Create {
             ]);
             return;
         }
+//fallback lock to avoid duplicate client creation
+$lock_name = 'quick-order-client-' . md5($normalized_phone);
+$supports_advisory_lock = in_array(
+    DB::connection()->getDriverName(),
+    ['mysql', 'mariadb']
+);
 
-        //fallback lock to avoid duplicate client creation
-        $lock_name = 'quick-order-client-' . md5($normalized_phone);
-        $supports_advisory_lock = in_array(
-            DB::connection()->getDriverName(),
-            ['mysql', 'mariadb']
-        );
+if ($supports_advisory_lock) {
+    DB::select('SELECT GET_LOCK(?, 10)', [$lock_name]);
+}
 
-        if ($supports_advisory_lock) {
-            DB::select('SELECT GET_LOCK(?, 10)', [$lock_name]);
-        }
+try {
 
-        try {
+    $existing_client = Client::where('client_phone', $normalized_phone)
+        ->lockForUpdate()
+        ->orderBy('client_id', 'asc')
+        ->first();
 
-            $existing_client = Client::where('client_phone', $normalized_phone)
-                ->lockForUpdate()
-                ->orderBy('client_id', 'asc')
-                ->first();
-
-            if ($existing_client) {
-                request()->merge([
-                    'ticket_clientid' => $existing_client->client_id,
-                ]);
-                return;
-            }
-
-            /**
-             * -------------------------------------------------------------
-             * CREATE NEW CLIENT (Quick Order)
-             * -------------------------------------------------------------
-             */
-            $client = new Client();
-            $client->client_creatorid = auth()->id() ?? 0;
-            $client->client_company_name = $this->deriveQuickOrderClientName($request);
-            $client->client_phone = $normalized_phone;
-            $client->client_categoryid = 2;
-            $client->client_status = 'active';
-            $client->client_created = now();
-            $client->save();
-
-            /**
-             * -------------------------------------------------------------
-             * CREATE MANDATORY USER FOR NEW CLIENT
-             * (email is optional / null allowed)
-             * -------------------------------------------------------------
-             */
-            $user = new User();
-            $user->name = $client->client_company_name ?: __('lang.client');
-            $user->email = null;
-            $user->password = bcrypt(Str::random(32)); // technical user
-            $user->is_client = true;
-            $user->clientid = $client->client_id;
-            $user->status = 'active';
-            $user->save();
-
-            //bind client → user
-            $client->user_id = $user->id;
-            $client->save();
-
-            request()->merge([
-                'type' => 'client',
-                'clientid' => $client->client_id,
-                'role_id' => 2,
-                'account_owner' => 'yes',
-                'first_name' => $client->client_company_name,
-                'last_name' => '',
-                'email' => null,
-            ]);
-
-            $user_id = app(UserRepository::class)->create(bcrypt(str_random(16)));
-
-            if ($user_id === false || !$user_id) {
-                throw new \RuntimeException('Quick order: user create failed');
-            }
-
-            $client->user_id = $user_id;
-            $client->save();
-
-            request()->merge([
-                'ticket_clientid' => $client->client_id,
-            ]);
-
-        } finally {
-            if ($supports_advisory_lock) {
-                DB::select('SELECT RELEASE_LOCK(?)', [$lock_name]);
-            }
-        }
+    if ($existing_client) {
+        request()->merge([
+            'ticket_clientid' => $existing_client->client_id,
+        ]);
+        return;
     }
+
+    /**
+     * -------------------------------------------------------------
+     * CREATE NEW CLIENT (Quick Order)
+     * -------------------------------------------------------------
+     */
+    $client = new Client();
+    $client->client_creatorid = auth()->id() ?? 0;
+    $client->client_company_name = $this->deriveQuickOrderClientName($request);
+    $client->client_phone = $normalized_phone;
+    $client->client_categoryid = 2;
+    $client->client_status = 'active';
+    $client->client_created = now();
+    $client->save();
+
+    /**
+     * -------------------------------------------------------------
+     * CREATE MANDATORY USER FOR NEW CLIENT
+     * (platform contract via UserRepository)
+     * -------------------------------------------------------------
+     */
+    request()->merge([
+        'type' => 'client',
+        'clientid' => $client->client_id,
+        'role_id' => 2,
+        'account_owner' => 'yes',
+        'first_name' => $client->client_company_name,
+        'last_name' => '',
+        'email' => null,
+    ]);
+
+    $user_id = app(UserRepository::class)->create(bcrypt(str_random(16)));
+
+    if ($user_id === false || !$user_id) {
+        throw new \RuntimeException('Quick order: user create failed');
+    }
+
+    //bind client → user
+    $client->user_id = $user_id;
+    $client->save();
+
+    request()->merge([
+        'ticket_clientid' => $client->client_id,
+    ]);
+
+} finally {
+    if ($supports_advisory_lock) {
+        DB::select('SELECT RELEASE_LOCK(?)', [$lock_name]);
+    }
+}
+
 
     /**
      * normalize phone into a canonical lookup format
