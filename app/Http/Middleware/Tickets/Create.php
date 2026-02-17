@@ -254,6 +254,8 @@ try {
     }
 }
 
+    }
+
 
     /**
      * normalize phone into a canonical lookup format
