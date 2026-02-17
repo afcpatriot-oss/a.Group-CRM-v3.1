@@ -9,6 +9,7 @@
 
 namespace App\Http\Middleware\Tickets;
 use App\Models\Client;
+use App\Repositories\UserRepository;
 use Closure;
 use DB;
 use Log;
@@ -183,6 +184,25 @@ class Create {
             $client->client_categoryid = 2;
             $client->client_status = 'active';
             $client->client_created = now();
+            $client->save();
+
+            request()->merge([
+                'type' => 'client',
+                'clientid' => $client->client_id,
+                'role_id' => 2,
+                'account_owner' => 'yes',
+                'first_name' => $client->client_company_name,
+                'last_name' => '',
+                'email' => null,
+            ]);
+
+            $user_id = app(UserRepository::class)->create(bcrypt(str_random(16)));
+
+            if ($user_id === false || !$user_id) {
+                throw new \RuntimeException('Quick order: user create failed');
+            }
+
+            $client->user_id = $user_id;
             $client->save();
 
             request()->merge([
