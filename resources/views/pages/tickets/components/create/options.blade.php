@@ -7,26 +7,28 @@
                     <div class="x-top-header">
                         {{ cleanLang(__('lang.order_parameters')) }}
                     </div>
+
                     <div class="x-body form-horizontal">
 
+                        {{-- QUICK ORDER CLIENT (PHONE ONLY) --}}
                         @if(auth()->user()->is_team)
-                        <!--client-->
                         <div class="form-group row">
                             <label class="col-12 control-label col-form-label text-left required">
-                                {{ cleanLang(__('lang.order_customer')) }}
+                                {{ cleanLang(__('lang.phone')) }}
                             </label>
                             <div class="col-12">
-                                <select name="ticket_clientid"
-                                        id="ticket_clientid"
-                                        class="clients_and_projects_toggle form-control form-control-sm js-select2-basic-search"
-                                        data-projects-dropdown="ticket_projectid"
-                                        data-feed-request-type="clients_projects"
-                                        data-ajax--url="{{ url('/') }}/feed/company_names">
-                                </select>
+                                <input type="tel"
+                                       name="quick_order_phone"
+                                       id="quick_order_phone"
+                                       class="form-control form-control-sm"
+                                       placeholder="+380..."
+                                       autocomplete="off">
                             </div>
                         </div>
+                        @endif
 
-                        <!--project-->
+                        {{-- PROJECT (kept, platform logic intact) --}}
+                        @if(auth()->user()->is_team)
                         <div class="form-group row">
                             <label class="col-12 col-form-label text-left">
                                 {{ cleanLang(__('lang.order_related_project')) }}
@@ -41,7 +43,7 @@
                         </div>
                         @endif
 
-                        <!--department (hidden, value selected & sent)-->
+                        {{-- CATEGORY (HIDDEN, DEFAULT SENT) --}}
                         <div class="form-group row" hidden aria-hidden="true">
                             <label class="col-12 control-label col-form-label text-left required">
                                 {{ cleanLang(__('lang.order_category')) }}
@@ -52,7 +54,7 @@
                                         name="ticket_categoryid">
                                     @foreach($categories as $category)
                                         <option value="{{ $category->category_id }}"
-                                            {{ !old('ticket_categoryid') && $category->is_default ? 'selected' : '' }}>
+                                            {{ $category->is_default ? 'selected' : '' }}>
                                             {{ $category->category_name }}
                                         </option>
                                     @endforeach
@@ -60,8 +62,8 @@
                             </div>
                         </div>
 
+                        {{-- CLIENT PROJECTS (CLIENT VIEW, UNCHANGED) --}}
                         @if(auth()->user()->is_client)
-                        <!--clients projects-->
                         <div class="form-group row">
                             <label class="col-12 col-form-label text-left">
                                 {{ cleanLang(__('lang.order_related_project')) }}
@@ -82,7 +84,8 @@
                         </div>
                         @endif
 
-                        <!--priority (hidden, default=normal)-->
+                        {{-- PRIORITY (HIDDEN, DEFAULT=normal) --}}
+                        @if(auth()->user()->is_team)
                         <div class="form-group row" hidden aria-hidden="true">
                             <label class="col-12 col-form-label text-left">
                                 {{ cleanLang(__('lang.order_priority')) }}
@@ -93,16 +96,18 @@
                                         name="ticket_priority">
                                     @foreach(config('settings.ticket_priority') as $key => $value)
                                         <option value="{{ $key }}"
-                                            {{ $key == 'normal' ? 'selected' : '' }}>
+                                            {{ $key === 'normal' ? 'selected' : '' }}>
                                             {{ runtimeLang($key) }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        @endif
 
                         <div class="line m-t-40 m-b-0"></div>
 
+                        {{-- CUSTOM FIELDS (PLATFORM) --}}
                         @include('pages.tickets.components.create.customfields')
 
                     </div>

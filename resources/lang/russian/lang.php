@@ -5,9 +5,7 @@
 
 return [
 
-
-
-
+'order_created_by_system' => 'Создано системой',
 'orders' => 'Заказы',
 'order' => 'Заказ',
 'create' => 'Создать',
